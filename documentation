@@ -1,0 +1,65 @@
+from openai import OpenAI
+
+class AssistantManager:
+    def __init__(self, client):
+        """
+        Classe para gerenciar assistentes da OpenAI.
+        
+        Args:
+            client (OpenAI): Instância do cliente OpenAI.
+        """
+        self.client = client
+        self.assistants = []  # Lista para armazenar os assistentes criados
+        self.threads = []     # Lista para armazenar os threads criados
+
+    def create_assistants(self, assistants_data):
+        """
+        Cria assistentes da OpenAI conforme os dados fornecidos.
+        
+        Args:
+            assistants_data (list): Lista de dicionários contendo os detalhes de cada assistente a ser criado.
+        """
+        for assistant_data in assistants_data:
+            assistant = self.client.beta.assistants.create(**assistant_data)
+            self.assistants.append(assistant)
+
+    def create_threads(self, num_threads):
+        """
+        Cria threads para interagir com os assistentes.
+        
+        Args:
+            num_threads (int): Número de threads a serem criados.
+        """
+        self.threads = [self.client.beta.threads.create() for _ in range(num_threads)]
+
+    def send_messages(self, messages_data):
+        """
+        Envia mensagens para os threads criados.
+        
+        Args:
+            messages_data (list): Lista de dicionários contendo os detalhes de cada mensagem a ser enviada.
+        """
+        for message_data in messages_data:
+            self.client.beta.threads.messages.create(**message_data)
+
+    def submit_tool_outputs(self, tool_outputs_data):
+        """
+        Submete saídas de ferramentas para os threads criados.
+        
+        Args:
+            tool_outputs_data (list): Lista de dicionários contendo os detalhes de cada saída de ferramenta a ser submetida.
+        """
+        for tool_output_data in tool_outputs_data:
+            self.client.beta.threads.runs.submit_tool_outputs(**tool_output_data)
+
+# Note que os dados dos assistentes, mensagens e saídas de ferramentas devem ser fornecidos pelo usuário antes de executar o script.
+
+# Criação e gerenciamento dos assistentes
+client = OpenAI()
+manager = AssistantManager(client)
+
+# Exemplo de uso:
+# manager.create_assistants(assistants_data)
+# manager.create_threads(5)
+# manager.send_messages(messages_data)
+# manager.submit_tool_outputs(tool_outputs_data)
